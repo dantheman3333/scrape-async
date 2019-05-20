@@ -52,7 +52,6 @@ class SeleniumActor(driverOptions: ChromeOptions) extends Actor with ActorLoggin
 }
 
 object SeleniumActor {
-  val name = "selenium-actor"
 
   def props(driverOptions: ChromeOptions): Props = Props(new SeleniumActor(driverOptions))
 

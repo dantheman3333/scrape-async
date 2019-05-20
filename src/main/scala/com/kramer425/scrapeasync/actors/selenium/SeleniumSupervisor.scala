@@ -1,6 +1,6 @@
 package com.kramer425.scrapeasync.actors.selenium
 
-import akka.actor.{Actor, ActorLogging, Kill, PoisonPill, Props, Terminated}
+import akka.actor.{Actor, ActorLogging, Kill, Props, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.kramer425.scrapeasync.SeleniumWork
 import com.kramer425.scrapeasync.actors.selenium.SeleniumActor.DriverInitException
@@ -9,8 +9,8 @@ import org.openqa.selenium.chrome.ChromeOptions
 class SeleniumSupervisor(driverOptions: ChromeOptions, count: Int) extends Actor with ActorLogging {
 
   private var router = {
-    val routees = Vector.tabulate(count) { n =>
-      val r = context.actorOf(SeleniumActor.props(driverOptions), s"selenium-actor-$n")
+    val routees = Vector.fill(count) {
+      val r = context.actorOf(SeleniumActor.props(driverOptions))
       context watch r
       ActorRefRoutee(r)
     }
@@ -22,11 +22,11 @@ class SeleniumSupervisor(driverOptions: ChromeOptions, count: Int) extends Actor
   override def postStop(): Unit = log.info("Selenium Supervisor stopped")
 
   override def receive = {
-        case work: SeleniumWork =>
-          router.route(work, sender)
+    case work: SeleniumWork =>
+      router.route(work, sender)
     case Terminated(a) =>
       router = router.removeRoutee(a)
-      val r = context.actorOf(SeleniumActor.props(driverOptions), s"selenium-actor")
+      val r = context.actorOf(SeleniumActor.props(driverOptions))
       context watch r
       router = router.addRoutee(r)
     case e: DriverInitException =>
