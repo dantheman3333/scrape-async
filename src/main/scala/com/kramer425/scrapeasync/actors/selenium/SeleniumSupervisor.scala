@@ -17,9 +17,9 @@ class SeleniumSupervisor(driverOptions: ChromeOptions, count: Int) extends Actor
     Router(RoundRobinRoutingLogic(), routees)
   }
 
-  override def preStart(): Unit = log.info("Selenium Supervisor started")
+  override def preStart(): Unit = log.debug("Selenium Supervisor started")
 
-  override def postStop(): Unit = log.info("Selenium Supervisor stopped")
+  override def postStop(): Unit = log.debug("Selenium Supervisor stopped")
 
   override def receive = {
     case work: SeleniumWork =>

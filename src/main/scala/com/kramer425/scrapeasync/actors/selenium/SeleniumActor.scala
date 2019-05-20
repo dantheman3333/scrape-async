@@ -33,7 +33,7 @@ class SeleniumActor(driverOptions: ChromeOptions) extends Actor with ActorLoggin
 
   override def postStop(): Unit = {
     this.webDriver.foreach(_.quit())
-    log.info("Selenium Actor stopped")
+    log.debug("Selenium Actor stopped")
   }
 
   override def receive = {
