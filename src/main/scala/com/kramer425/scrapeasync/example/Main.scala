@@ -3,8 +3,7 @@ package com.kramer425.scrapeasync.example
 
 import com.kramer425.scrapeasync.util.FutureWorkAttemptPrinter
 import com.kramer425.scrapeasync.{SeleniumScapeAsync, SeleniumWork, WorkAttempt}
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -38,7 +37,7 @@ object Main {
 }
 
 class GoogleWork extends SeleniumWork {
-  override def execute(webDriver: WebDriver): Unit = {
+  override def execute(webDriver: ChromeDriver): Unit = {
     webDriver.get("https://www.google.com")
 
     val title = webDriver.getTitle
