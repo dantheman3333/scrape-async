@@ -6,7 +6,7 @@ trait SeleniumWork {
   def execute(webDriver: ChromeDriver)
 }
 
-sealed abstract case class WorkAttempt(work: SeleniumWork)
+sealed abstract class WorkAttempt(val work: SeleniumWork)
 
 final case class WorkFinished(override val work: SeleniumWork) extends WorkAttempt(work)
 
