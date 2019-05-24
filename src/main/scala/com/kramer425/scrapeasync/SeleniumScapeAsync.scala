@@ -17,21 +17,17 @@ class SeleniumScapeAsync(options: ChromeOptions, seleniumInstances: Int, private
 
 
   def submitWork(work: SeleniumWork): Future[WorkAttempt] = {
-    try {
-      (supervisor ? work) (timeout).mapTo[WorkAttempt]
-    } catch {
-      case e: AskTimeoutException => Future.successful(WorkFailed(work, e))
-    }
+    (supervisor ? work) (timeout).mapTo[WorkAttempt].recover {
+      case e: AskTimeoutException => WorkFailed(work, e)
+    }(system.dispatcher)
   }
 
   def submitWorks(work: Seq[SeleniumWork]): Seq[Future[WorkAttempt]] = {
     work.map(work => {
-      try {
-        (supervisor ? work) (timeout)
-      } catch {
-        case e: AskTimeoutException => Future.successful(WorkFailed(work, e))
-      }
-    }).map(_.mapTo[WorkAttempt])
+      (supervisor ? work) (timeout).mapTo[WorkAttempt].recover {
+        case e: AskTimeoutException => WorkFailed(work, e)
+      }(system.dispatcher)
+    })
   }
 
   def shutdown(): Unit = Await.result(system.terminate(), Duration.Inf)
