@@ -1,7 +1,7 @@
 package com.kramer425.scrapeasync
 
 import akka.actor.ActorSystem
-import akka.pattern.ask
+import akka.pattern.{AskTimeoutException, ask}
 import akka.util.Timeout
 import com.kramer425.scrapeasync.actors.selenium.SeleniumSupervisor
 import org.openqa.selenium.chrome.ChromeOptions
@@ -17,11 +17,21 @@ class SeleniumScapeAsync(options: ChromeOptions, seleniumInstances: Int, private
 
 
   def submitWork(work: SeleniumWork): Future[WorkAttempt] = {
-    (supervisor ? work)(timeout).mapTo[WorkAttempt]
+    try {
+      (supervisor ? work) (timeout).mapTo[WorkAttempt]
+    } catch {
+      case e: AskTimeoutException => Future.successful(WorkFailed(work, e))
+    }
   }
 
   def submitWorks(work: Seq[SeleniumWork]): Seq[Future[WorkAttempt]] = {
-    work.map(work => (supervisor ? work)(timeout)).map(_.mapTo[WorkAttempt])
+    work.map(work => {
+      try {
+        (supervisor ? work) (timeout)
+      } catch {
+        case e: AskTimeoutException => Future.successful(WorkFailed(work, e))
+      }
+    }).map(_.mapTo[WorkAttempt])
   }
 
   def shutdown(): Unit = Await.result(system.terminate(), Duration.Inf)
