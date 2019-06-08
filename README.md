@@ -1,6 +1,6 @@
 # scrape-async
 
-Scrape websites with chrome & selenium in an asyncronous fashion. 
+Scrape websites with chrome & selenium in an asynchronous fashion. 
 
 #### Example:
 
